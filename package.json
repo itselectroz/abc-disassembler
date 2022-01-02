@@ -4,8 +4,7 @@
   "description": "Typescript Actionscript Bytecode Disassembler",
   "main": "dist/index.js",
   "scripts": {
-    "build": "ttsc",
-    "test": "ttsc && node dist/test/index.js"
+    "build": "ttsc"
   },
   "repository": {
     "type": "git",
