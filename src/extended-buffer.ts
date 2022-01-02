@@ -1,4 +1,4 @@
-export default class ExtendedBuffer {
+export class ExtendedBuffer {
     data: Buffer;
 
     offset: number = 0;

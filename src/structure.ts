@@ -1,4 +1,4 @@
-import ExtendedBuffer from "./extended-buffer";
+import { ExtendedBuffer } from "./extended-buffer";
 
 export class Structure {
     static read(data: ExtendedBuffer) : Structure {

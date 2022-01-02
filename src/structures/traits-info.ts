@@ -1,5 +1,5 @@
 import { u30, u8, vector } from "../defined-transformer-types";
-import ExtendedBuffer from "../extended-buffer";
+import { ExtendedBuffer } from "../extended-buffer";
 import { Structure } from "../structure";
 
 enum TraitTypes {
@@ -25,13 +25,13 @@ export class TraitsInfo extends Structure {
     data: TraitSlot | TraitClass | TraitFunction | TraitMethod = null as any;
     metadata: vector<u30, u30> = [];
 
-    static read(data: ExtendedBuffer) : TraitsInfo {
+    static read(data: ExtendedBuffer): TraitsInfo {
         const structure = new TraitsInfo();
 
         structure.name = data.readUInt30();
         structure.kind = data.readUInt8();
-        
-        switch(structure.kind) {
+
+        switch (structure.kind) {
             case TraitTypes.Slot:
             case TraitTypes.Const:
                 structure.data = TraitSlot.read(data) as any;
@@ -51,7 +51,7 @@ export class TraitsInfo extends Structure {
 
         const length = data.readUInt30();
         structure.metadata = [];
-        for(let i = 0; i < length; i++) {
+        for (let i = 0; i < length; i++) {
             structure.metadata.push(data.readUInt30());
         }
 
@@ -63,7 +63,7 @@ export class TraitsInfo extends Structure {
         data.writeUInt8(this.kind);
         this.data.write(data);
         data.writeUInt30(this.metadata.length);
-        for(let i = 0; i < this.metadata.length; i++) {
+        for (let i = 0; i < this.metadata.length; i++) {
             data.writeUInt30(this.metadata[i]);
         }
     }

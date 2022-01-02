@@ -1,5 +1,5 @@
-import { u30, u8, vector } from "../defined-transformer-types";
-import ExtendedBuffer from "../extended-buffer";
+import { u30 } from "../defined-transformer-types";
+import { ExtendedBuffer } from "../extended-buffer";
 import { Structure } from "../structure";
 
 export enum MultinameKind {
@@ -24,12 +24,12 @@ export class MultinameInfo extends Structure {
         const structure = new MultinameInfo();
         structure.kind = data.readUInt8() as MultinameKind;
 
-        switch(structure.kind) {
+        switch (structure.kind) {
             case MultinameKind.QName:
             case MultinameKind.QNameA:
                 structure.data = MultinameKindQName.read(data);
                 break;
-            
+
             case MultinameKind.RTQName:
             case MultinameKind.RTQNameA:
                 structure.data = MultinameKindRTQName.read(data);
@@ -39,7 +39,7 @@ export class MultinameInfo extends Structure {
             case MultinameKind.RTQNameLA:
                 structure.data = MultinameKindRTQName.read(data);
                 break;
-            
+
             case MultinameKind.Multiname:
             case MultinameKind.MultinameA:
                 structure.data = MultinameKindMultiname.read(data);
