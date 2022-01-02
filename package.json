@@ -9,12 +9,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://www.github.com/abc-disassembler"
+    "url": "https://www.github.com/itselectroz/abc-disassembler"
   },
   "author": "Harry Whittle",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.6",
+    "ts-node": "^10.4.0",
     "ttypescript": "^1.5.13",
     "typescript": "^4.5.4"
   }
