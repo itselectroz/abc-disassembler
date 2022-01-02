@@ -1,0 +1,21 @@
+{
+  "name": "abc-disassembler",
+  "version": "1.0.0",
+  "description": "Typescript Actionscript Bytecode Disassembler",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "ttsc",
+    "test": "ttsc && node dist/test/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://www.github.com/abc-disassembler"
+  },
+  "author": "itselectroz",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^17.0.6",
+    "ttypescript": "^1.5.13",
+    "typescript": "^4.5.4"
+  }
+}
