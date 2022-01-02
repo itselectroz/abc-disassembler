@@ -53,6 +53,11 @@ export class MultinameInfo extends Structure {
 
         return structure;
     }
+
+    write(data: ExtendedBuffer) {
+        data.writeUInt8(this.kind);
+        this.data.write(data);
+    }
 }
 
 export class MultinameKindQName extends Structure {
