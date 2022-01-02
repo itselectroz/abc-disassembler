@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 import { createReadTypeAssignment, createReadFunction } from './read-statements';
 import { logNode } from './transformer-logger';
-import { ClassData, Constant, CustomData, Property, TypeData, VectorData } from './transformer-types';
+import { ClassData, Constant, CustomData, OptionalData, Property, TypeData, VectorData } from './transformer-types';
 import { createWriteFunction, createWriteStatement } from './write-statements';
 
 let importMappings: any = {};
@@ -126,6 +126,41 @@ export function handleTypeNode(typeNode: ts.TypeNode): TypeData | false {
                         importName: importMappings[customTypeIdentifier.escapedText.toString()]
                     } as CustomData
                 };
+            }
+            else if (type == "optional") {
+                const typeArguments = typeReferenceNode.typeArguments;
+                if (!typeArguments || typeArguments.length != 2) {
+                    throw SyntaxError(`Not enough arguments for optional type. Expected 2 got ${typeArguments?.length || 0}`);
+                }
+
+                const valueType = handleTypeNode(typeArguments[0]);
+                const comparisonType = handleTypeNode(typeArguments[1]);
+
+                if (!valueType || !comparisonType) {
+                    throw SyntaxError("Invalid type in optional.");
+                }
+
+                if (["constant"].includes(valueType.type)) {
+                    throw SyntaxError(`Invalid value type in optional. Got ${valueType.type}`);
+                }
+
+                if (comparisonType.type != "constant") {
+                    throw SyntaxError(`Invalid length type in optional. Got ${comparisonType.type}`);
+                }
+
+                const comparisonConstant = comparisonType.data as Constant;
+
+                if(comparisonConstant.type != "string") {
+                    throw SyntaxError(`Invalid length type in optional. Got ${comparisonConstant.type}`);
+                }
+
+                return {
+                    type,
+                    data: {
+                        valueType,
+                        comparisonName: comparisonConstant.value
+                    } as OptionalData
+                }
             }
             else {
                 return {

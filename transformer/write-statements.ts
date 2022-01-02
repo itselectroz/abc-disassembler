@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { createUniqueName } from '.';
-import { Constant, CustomData, TypeData, VectorData } from './transformer-types';
+import { Constant, CustomData, OptionalData, TypeData, VectorData } from './transformer-types';
 
 const factory = ts.factory;
 
@@ -158,6 +158,25 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
             )
 
             return statements;
+        }
+
+        case "optional": {
+            const optionalData: OptionalData = typeData.data;
+            
+            return [
+                factory.createIfStatement(
+                    factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createThis(),
+                            optionalData.comparisonName
+                        ),
+                        undefined,
+                        []
+                    ),
+                    factory.createBlock(createWriteStatement(optionalData.valueType, expression), false),
+                    undefined
+                )
+            ];
         }
 
         case "custom": {

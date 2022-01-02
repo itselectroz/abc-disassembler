@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { createUniqueName } from '.';
-import { TypeData, VectorStatement, Constant, VectorData, Property, CustomData } from './transformer-types';
+import { TypeData, VectorStatement, Constant, VectorData, Property, CustomData, OptionalData } from './transformer-types';
 
 const factory = ts.factory;
 
@@ -210,6 +210,76 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
                 ]
             );
         }
+        case "optional": {
+            const optionalData: OptionalData = typeData.data;
+
+            const optionalValuesIdentifier = createUniqueName("optionalValue");
+
+            const statements: ts.Statement[] = [
+                factory.createVariableStatement(
+                    undefined,
+                    factory.createVariableDeclarationList(
+                        [
+                            factory.createVariableDeclaration(
+                                optionalValuesIdentifier,
+                                undefined,
+                                undefined,
+                                factory.createIdentifier("undefined")
+                            )
+                        ],
+                        ts.NodeFlags.Let
+                    )
+                )
+            ];
+
+            const valueStatements: ts.Statement[] = [];
+
+            if (["vector","optional"].includes(optionalData.valueType.type)) {
+                const vectorStatement = createReadType(optionalData.valueType) as VectorStatement;
+
+                valueStatements.push(
+                    ...vectorStatement.statements,
+                    factory.createExpressionStatement(
+                        factory.createBinaryExpression(
+                            optionalValuesIdentifier,
+                            factory.createToken(ts.SyntaxKind.EqualsToken),
+                            vectorStatement.vectorIdentifier
+                        )
+                    )
+                )
+            }
+            else {
+                valueStatements.push(
+                    factory.createExpressionStatement(
+                        factory.createBinaryExpression(
+                            optionalValuesIdentifier,
+                            factory.createToken(ts.SyntaxKind.EqualsToken),
+                            createReadType(optionalData.valueType) as ts.Expression
+                        )
+                    )
+                );
+            }
+
+            statements.push(
+                factory.createIfStatement(
+                    factory.createCallExpression(
+                        factory.createPropertyAccessExpression(
+                            factory.createIdentifier("structure"),
+                            factory.createIdentifier(optionalData.comparisonName)
+                        ),
+                        undefined,
+                        []
+                    ),
+                    factory.createBlock(valueStatements, true),
+                    undefined
+                )
+            );
+
+            return {
+                statements,
+                vectorIdentifier: optionalValuesIdentifier
+            };
+        }
         default: {
             const functionName = getReadFunctionName(type);
 
@@ -232,7 +302,7 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
 export function createReadTypeAssignment(property: Property): ts.Statement[] {
     const typeData = property.type;
 
-    if (typeData.type == "vector") {
+    if (typeData.type == "vector" || typeData.type == "optional") {
         const vectorStatement = createReadType(typeData) as VectorStatement;
 
         return [

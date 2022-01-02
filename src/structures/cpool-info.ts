@@ -5,26 +5,13 @@ import { NamespaceInfo } from "./namespace-info";
 import { NSSetInfo } from "./namespace-set-info";
 
 export class CPoolInfo extends Structure {
-    int_count: u30 = 0;
-    integer: vector<s32, "int_count"> = [];
-
-    uint_count: u30 = 0;
-    uinteger: vector<u32, "uint_count"> = [];
-
-    double_count: u30 = 0;
-    double: vector<d64, "double_count"> = [];
-
-    string_count: u30 = 0;
-    string: vector<string, "string_count"> = [];
-
-    namespace_count: u30 = 0;
-    namespace: vector<custom<NamespaceInfo>, "namespace_count"> = [];
-
-    ns_set_count: u30 = 0;
-    ns_set: vector<custom<NSSetInfo>, "ns_set_count"> = [];
-
-    multiname_count: u30 = 0;
-    multiname: vector<custom<MultinameInfo>, "multiname_count"> = [];
+    integer: vector<s32, u30> = [];
+    uinteger: vector<u32, u30> = [];
+    double: vector<d64, u30> = [];
+    string: vector<string, u30> = [];
+    namespace: vector<custom<NamespaceInfo>, u30> = [];
+    ns_set: vector<custom<NSSetInfo>, u30> = [];
+    multiname: vector<custom<MultinameInfo>, u30> = [];
 }
 NamespaceInfo;
 NSSetInfo;

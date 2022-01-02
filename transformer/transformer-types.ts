@@ -33,6 +33,11 @@ export type CustomData = {
     className: string;
 }
 
+export type OptionalData = {
+    valueType: TypeData;
+    comparisonName: string;
+}
+
 export type Property = {
     name: string;
     type: TypeData;
