@@ -11,7 +11,7 @@
     "type": "git",
     "url": "https://www.github.com/abc-disassembler"
   },
-  "author": "itselectroz",
+  "author": "Harry Whittle",
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^17.0.6",
