@@ -28,6 +28,11 @@ export type VectorData = {
     lengthType: TypeData;
 }
 
+export type CustomData = {
+    importName: ts.Identifier;
+    className: string;
+}
+
 export type Property = {
     name: string;
     type: TypeData;

@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { createUniqueName } from '.';
-import { Constant, TypeData, VectorData } from './transformer-types';
+import { Constant, CustomData, TypeData, VectorData } from './transformer-types';
 
 const factory = ts.factory;
 
@@ -165,7 +165,7 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
                 factory.createExpressionStatement(
                     factory.createCallExpression(
                         factory.createPropertyAccessExpression(
-                            factory.createThis(),
+                            expression,
                             factory.createIdentifier("write")
                         ),
                         undefined,

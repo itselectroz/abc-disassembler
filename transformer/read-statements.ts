@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { createUniqueName } from '.';
-import { TypeData, VectorStatement, Constant, VectorData, Property } from './transformer-types';
+import { TypeData, VectorStatement, Constant, VectorData, Property, CustomData } from './transformer-types';
 
 const factory = ts.factory;
 
@@ -190,15 +190,18 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
             };
         }
         case "custom": {
-            const className: string = typeData.data;
+            const classData: CustomData = typeData.data;
 
-            if (typeof className != "string") {
-                throw new Error(`Something went wrong. Expected className to be type 'string' got '${typeof className}'`);
+            if (typeof classData.className != "string") {
+                throw new Error(`Something went wrong. Expected className to be type 'string' got '${typeof classData.className}'`);
             }
 
             return factory.createCallExpression(
                 factory.createPropertyAccessExpression(
-                    factory.createIdentifier(className),
+                    factory.createPropertyAccessExpression(
+                        classData.importName,
+                        classData.className
+                    ),
                     factory.createIdentifier("read")
                 ),
                 undefined,

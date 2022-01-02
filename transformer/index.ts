@@ -1,8 +1,10 @@
 import * as ts from 'typescript';
 import { createReadTypeAssignment, createReadFunction } from './read-statements';
 import { logNode } from './transformer-logger';
-import { ClassData, Constant, Property, TypeData, VectorData } from './transformer-types';
+import { ClassData, Constant, CustomData, Property, TypeData, VectorData } from './transformer-types';
 import { createWriteFunction, createWriteStatement } from './write-statements';
+
+let importMappings: any = {};
 
 const factory = ts.factory;
 
@@ -115,10 +117,14 @@ export function handleTypeNode(typeNode: ts.TypeNode): TypeData | false {
                 }
 
                 const customType = typeArgument as ts.TypeReferenceNode;
+                const customTypeIdentifier = customType.typeName as ts.Identifier;
 
                 return {
                     type,
-                    data: (customType.typeName as ts.Identifier).escapedText
+                    data: {
+                        className: customTypeIdentifier.escapedText,
+                        importName: importMappings[customTypeIdentifier.escapedText.toString()]
+                    } as CustomData
                 };
             }
             else {
@@ -132,7 +138,6 @@ export function handleTypeNode(typeNode: ts.TypeNode): TypeData | false {
 
 const transformer: ts.TransformerFactory<ts.SourceFile> = (context: ts.TransformationContext) => {
     return (sourceFile: ts.SourceFile) => {
-
         // Visit class declaration. We're looking for field declarations
         const classVisitor = (classData: ClassData, node: ts.Node): ts.Node => {
             logNode(node, 'class');
@@ -200,6 +205,28 @@ const transformer: ts.TransformerFactory<ts.SourceFile> = (context: ts.Transform
 
             logNode(node, 'root');
             switch (node.kind) {
+                case ts.SyntaxKind.ImportDeclaration:
+                    const importDeclaration = node as ts.ImportDeclaration;
+                    const importClause = importDeclaration.importClause;
+                    if(!importClause)
+                        break;
+
+                    const namedBindings = importClause.namedBindings;
+                    if(!namedBindings)
+                        break;
+                    
+                    if(namedBindings.kind != ts.SyntaxKind.NamedImports)
+                        break;
+
+                    const namedImports = namedBindings as ts.NamedImports;
+
+                    const generatedName = factory.getGeneratedNameForNode(importDeclaration);
+
+                    for(const element of namedImports.elements) {
+                        importMappings[element.name.escapedText.toString()] = generatedName;
+                    }
+                    
+                    break;
                 case ts.SyntaxKind.ExpressionStatement:
                     const expressionStatement = node as ts.ExpressionStatement;
                     const expression = expressionStatement.expression;
