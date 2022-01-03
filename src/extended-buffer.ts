@@ -77,7 +77,7 @@ export class ExtendedBuffer {
 
     readUTFString() {
         const length = this.readUInt30();
-        return this.readBytes(length).toString('utf-8');
+        return this.readBytes(length).toString('utf8');
     }
 
     writeBytes(bytes: Buffer) {
@@ -157,9 +157,11 @@ export class ExtendedBuffer {
     }
     
     writeUTFString(value: string) {
-        this.writeUInt30(value.length);
-        for(let i = 0; i < value.length; i++) {
-            this.writeUInt8(value.charCodeAt(i));
+        const utf8 = unescape(encodeURIComponent(value));
+
+        this.writeUInt30(utf8.length);
+        for(let i = 0; i < utf8.length; i++) {
+            this.writeUInt8(utf8.charCodeAt(i));
         }
     }
 }
