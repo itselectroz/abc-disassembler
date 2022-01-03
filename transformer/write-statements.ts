@@ -118,10 +118,20 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
                             undefined,
                             [
                                 type == "incrementedVector"
-                                    ? factory.createBinaryExpression(
-                                        vectorLengthIdentifier,
-                                        factory.createToken(ts.SyntaxKind.PlusToken),
-                                        factory.createNumericLiteral(1)
+                                    ? factory.createConditionalExpression(
+                                        factory.createBinaryExpression(
+                                            vectorIdentifier,
+                                            factory.createToken(ts.SyntaxKind.EqualsEqualsToken),
+                                            factory.createNumericLiteral(0)
+                                        ),
+                                        factory.createToken(ts.SyntaxKind.QuestionToken),
+                                        factory.createNumericLiteral(0),
+                                        factory.createToken(ts.SyntaxKind.ColonToken),
+                                        factory.createBinaryExpression(
+                                            vectorLengthIdentifier,
+                                            factory.createToken(ts.SyntaxKind.PlusToken),
+                                            factory.createNumericLiteral(1)
+                                        )
                                     )
                                     : vectorLengthIdentifier]
                         )

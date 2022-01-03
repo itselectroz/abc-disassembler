@@ -66,9 +66,11 @@ export class TraitsInfo extends Structure {
         data.writeUInt30(this.name);
         data.writeUInt8(this.kind);
         this.data.write(data);
-        data.writeUInt30(this.metadata.length);
-        for (let i = 0; i < this.metadata.length; i++) {
-            data.writeUInt30(this.metadata[i]);
+        if(((this.kind >> 4) & TraitAttributes.Metadata) != 0) {
+            data.writeUInt30(this.metadata.length);
+            for (let i = 0; i < this.metadata.length; i++) {
+                data.writeUInt30(this.metadata[i]);
+            }
         }
     }
 }
