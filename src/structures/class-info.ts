@@ -6,3 +6,4 @@ export class ClassInfo extends Structure {
     cinit: u30 = 0;
     traits: vector<custom<TraitsInfo>, u30> = [];
 }
+TraitsInfo

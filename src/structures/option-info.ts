@@ -5,3 +5,4 @@ import { OptionDetail } from "./option-detail";
 export class OptionInfo extends Structure {
     option: vector<custom<OptionDetail>, u30> = [];
 }
+OptionDetail

@@ -41,6 +41,7 @@ export class ExtendedBuffer {
     }
 
     readUInt32() {
+        const offset = this.offset;
         let value = 0;
         let bytes = 0;
         let pos = 0;
@@ -65,6 +66,7 @@ export class ExtendedBuffer {
         if((value >> 31) == 1) {
             value = -(value & 0x7fffffff);
         }
+        return value;
     }
 
     readDouble() {

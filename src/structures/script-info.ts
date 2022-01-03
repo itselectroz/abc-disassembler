@@ -6,3 +6,4 @@ export class ScriptInfo extends Structure {
     init: u30 = 0;
     trait: vector<custom<TraitsInfo>, u30> = [];
 }
+TraitsInfo

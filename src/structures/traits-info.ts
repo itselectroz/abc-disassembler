@@ -1,3 +1,4 @@
+import { optional } from "..";
 import { u30, u8, vector } from "../defined-transformer-types";
 import { ExtendedBuffer } from "../extended-buffer";
 import { Structure } from "../structure";
@@ -31,7 +32,7 @@ export class TraitsInfo extends Structure {
         structure.name = data.readUInt30();
         structure.kind = data.readUInt8();
 
-        switch (structure.kind) {
+        switch (structure.kind & 0xF) {
             case TraitTypes.Slot:
             case TraitTypes.Const:
                 structure.data = TraitSlot.read(data) as any;
@@ -49,10 +50,13 @@ export class TraitsInfo extends Structure {
                 break;
         }
 
-        const length = data.readUInt30();
-        structure.metadata = [];
-        for (let i = 0; i < length; i++) {
-            structure.metadata.push(data.readUInt30());
+        const attributes = (structure.kind >> 4);
+        if((attributes & TraitAttributes.Metadata) != 0) {
+            const length = data.readUInt30();
+            structure.metadata = [];
+            for (let i = 0; i < length; i++) {
+                structure.metadata.push(data.readUInt30());
+            }
         }
 
         return structure;
@@ -73,7 +77,11 @@ export class TraitSlot extends Structure {
     slot_id: u30 = 0;
     type_name: u30 = 0;
     vindex: u30 = 0;
-    vkind: u8 = 0;
+    vkind: optional<u8, "hasVIndex"> = 0;
+
+    hasVIndex() {
+        return this.vindex != 0;
+    }
 }
 
 export class TraitClass extends Structure {

@@ -22,3 +22,4 @@ export class InstanceInfo extends Structure {
         return (this.flags & InstanceInfoFlags.ClassProtectedNs) != 0;
     }
 }
+TraitsInfo

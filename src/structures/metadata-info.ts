@@ -6,3 +6,4 @@ export class MetadataInfo extends Structure {
     name: u30 = 0;
     items: vector<custom<ItemInfo>, u30> = [];
 }
+ItemInfo

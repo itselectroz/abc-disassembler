@@ -36,7 +36,8 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
         case "constant":
             throw new Error("Unable to write constants.");
 
-        case "vector": {
+        case "vector":
+        case "incrementedVector": {
             const vectorIdentifier = createUniqueName("vectorValue");
 
             const statements: ts.Statement[] = [
@@ -116,8 +117,13 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
                             ),
                             undefined,
                             [
-                                vectorLengthIdentifier
-                            ]
+                                type == "incrementedVector"
+                                    ? factory.createBinaryExpression(
+                                        vectorLengthIdentifier,
+                                        factory.createToken(ts.SyntaxKind.PlusToken),
+                                        factory.createNumericLiteral(1)
+                                    )
+                                    : vectorLengthIdentifier]
                         )
                     )
                 );
@@ -162,7 +168,7 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
 
         case "optional": {
             const optionalData: OptionalData = typeData.data;
-            
+
             return [
                 factory.createIfStatement(
                     factory.createCallExpression(

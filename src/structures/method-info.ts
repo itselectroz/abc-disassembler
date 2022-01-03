@@ -29,3 +29,4 @@ export class MethodInfo extends Structure {
         return (this.flags & MethodInfoFlags.HAS_PARAM_NAMES) != 0;
     }
 }
+OptionInfo

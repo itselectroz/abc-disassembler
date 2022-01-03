@@ -55,7 +55,8 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
                 }
             }
         }
-        case "vector": {
+        case "vector":
+        case "incrementedVector": {
             const vectorValuesIdentifier = createUniqueName("vectorValues");
 
             const statements: ts.Statement[] = [
@@ -126,11 +127,19 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
                 lessThanExpression = vectorLengthIdentifier;
             }
 
+            if (type == "incrementedVector") {
+                lessThanExpression = factory.createBinaryExpression(
+                    lessThanExpression,
+                    factory.createToken(ts.SyntaxKind.MinusToken),
+                    factory.createNumericLiteral(1)
+                );
+            }
+
             const uniqueIndexName = createUniqueName("i");
 
             const valueStatements: ts.Statement[] = [];
 
-            if (["vector"].includes(valueType.type)) {
+            if (["vector", "incrementedVector"].includes(valueType.type)) {
                 const vectorStatement = createReadType(valueType) as VectorStatement;
 
                 valueStatements.push(
@@ -234,7 +243,7 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
 
             const valueStatements: ts.Statement[] = [];
 
-            if (["vector","optional"].includes(optionalData.valueType.type)) {
+            if (["vector", "incrementedVector", "optional"].includes(optionalData.valueType.type)) {
                 const vectorStatement = createReadType(optionalData.valueType) as VectorStatement;
 
                 valueStatements.push(
@@ -302,7 +311,7 @@ const createReadType = (typeData: TypeData): ts.Expression | VectorStatement => 
 export function createReadTypeAssignment(property: Property): ts.Statement[] {
     const typeData = property.type;
 
-    if (typeData.type == "vector" || typeData.type == "optional") {
+    if (["vector", "incrementedVector", "optional"].includes(typeData.type)) {
         const vectorStatement = createReadType(typeData) as VectorStatement;
 
         return [

@@ -13,3 +13,5 @@ export class MethodBodyInfo extends Structure {
     exception: vector<custom<ExceptionInfo>, u30> = [];
     trait: vector<custom<TraitsInfo>, u30> = [];
 }
+ExceptionInfo;
+TraitsInfo;

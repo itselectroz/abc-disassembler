@@ -20,3 +20,10 @@ export class AbcFile extends Structure {
     script: vector<custom<ScriptInfo>, u30> = [];
     method_body: vector<custom<MethodBodyInfo>, u30> = [];
 }
+ClassInfo
+CPoolInfo
+InstanceInfo
+MetadataInfo
+MethodBodyInfo
+MethodInfo
+ScriptInfo

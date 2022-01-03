@@ -7,5 +7,6 @@ export type s32 = number;
 export type d64 = number;
 
 export type vector<type, _lengthType> = type[];
+export type incrementedVector<type, _lengthType> = type[];
 export type custom<type> = type;
 export type optional<type, _field> = type;

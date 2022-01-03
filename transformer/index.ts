@@ -75,7 +75,7 @@ export function handleTypeNode(typeNode: ts.TypeNode): TypeData | false {
             const typeNameNode = <ts.Identifier>(typeReferenceNode).typeName;
             const type = typeNameNode.escapedText.toString();
 
-            if (type == "vector") {
+            if (type == "vector" || type == "incrementedVector") {
                 const typeArguments = typeReferenceNode.typeArguments;
                 if (!typeArguments || typeArguments.length != 2) {
                     throw SyntaxError(`Not enough arguments for vector type. Expected 2 got ${typeArguments?.length || 0}`);
@@ -92,12 +92,12 @@ export function handleTypeNode(typeNode: ts.TypeNode): TypeData | false {
                     throw SyntaxError(`Invalid value type in vector. Got ${valueType.type}`);
                 }
 
-                if (["custom", "vector", "boolean", "float"].includes(lengthType.type)) {
+                if (["custom", "vector", "incrementedVector", "boolean", "float"].includes(lengthType.type)) {
                     throw SyntaxError(`Invalid length type in vector. Got ${lengthType.type}`);
                 }
 
                 return {
-                    type: "vector",
+                    type,
                     data: {
                         valueType,
                         lengthType
