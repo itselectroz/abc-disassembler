@@ -12,13 +12,6 @@ export class CPoolInfo extends Structure {
     namespace: incrementedVector<custom<NamespaceInfo>, u30> = [];
     ns_set: incrementedVector<custom<NSSetInfo>, u30> = [];
     multiname: incrementedVector<custom<MultinameInfo>, u30> = [];
-
-    asd: optional<u30, "test"> = 0;
-    
-    test() {
-        // console.log(this);
-        return false;
-    }
 }
 NamespaceInfo;
 NSSetInfo;
