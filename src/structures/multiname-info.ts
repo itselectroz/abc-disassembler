@@ -1,3 +1,4 @@
+import { vector } from "..";
 import { u30 } from "../defined-transformer-types";
 import { ExtendedBuffer } from "../extended-buffer";
 import { Structure } from "../structure";
@@ -12,13 +13,14 @@ export enum MultinameKind {
     Multiname = 0x09,
     MultinameA = 0x0E,
     MultinameL = 0x1B,
-    MultinameLA = 0x1C
+    MultinameLA = 0x1C,
+    TypeName = 0x1D
 }
 
 "ignore"
 export class MultinameInfo extends Structure {
     kind: MultinameKind = 0;
-    data: MultinameKindQName | MultinameKindRTQName | MultinameKindRTQNameL | MultinameKindMultiname | MultinameKindMultinameL = null as any;
+    data: MultinameKindQName | MultinameKindRTQName | MultinameKindRTQNameL | MultinameKindMultiname | MultinameKindMultinameL | MultinameKindTypeName = null as any;
 
     static read(data: ExtendedBuffer): MultinameInfo {
         const structure = new MultinameInfo();
@@ -48,6 +50,9 @@ export class MultinameInfo extends Structure {
             case MultinameKind.MultinameL:
             case MultinameKind.MultinameLA:
                 structure.data = MultinameKindMultinameL.read(data);
+                break;
+            case MultinameKind.TypeName:
+                structure.data = MultinameKindTypeName.read(data);
                 break;
         }
 
@@ -80,4 +85,9 @@ export class MultinameKindMultiname extends Structure {
 
 export class MultinameKindMultinameL extends Structure {
     ns_set: u30 = 0;
+}
+
+export class MultinameKindTypeName extends Structure {
+    name: u30 = 0;
+    params: vector<u30, u30> = [];
 }

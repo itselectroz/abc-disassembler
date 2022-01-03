@@ -32,6 +32,7 @@ export class TraitsInfo extends Structure {
         structure.name = data.readUInt30();
         structure.kind = data.readUInt8();
 
+        console.log(structure.kind & 0xF);
         switch (structure.kind & 0xF) {
             case TraitTypes.Slot:
             case TraitTypes.Const:
@@ -49,6 +50,7 @@ export class TraitsInfo extends Structure {
                 structure.data = TraitMethod.read(data) as any;
                 break;
         }
+        console.log(structure.data);
 
         const attributes = (structure.kind >> 4);
         if((attributes & TraitAttributes.Metadata) != 0) {

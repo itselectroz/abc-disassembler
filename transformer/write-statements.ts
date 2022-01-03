@@ -120,7 +120,7 @@ export function createWriteStatement(typeData: TypeData, expression: ts.Expressi
                                 type == "incrementedVector"
                                     ? factory.createConditionalExpression(
                                         factory.createBinaryExpression(
-                                            vectorIdentifier,
+                                            vectorLengthIdentifier,
                                             factory.createToken(ts.SyntaxKind.EqualsEqualsToken),
                                             factory.createNumericLiteral(0)
                                         ),
