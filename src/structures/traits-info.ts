@@ -3,7 +3,7 @@ import { u30, u8, vector } from "../defined-transformer-types";
 import { ExtendedBuffer } from "../extended-buffer";
 import { Structure } from "../structure";
 
-enum TraitTypes {
+export enum TraitTypes {
     Slot,
     Method,
     Getter,
@@ -13,7 +13,7 @@ enum TraitTypes {
     Const
 }
 
-enum TraitAttributes {
+export enum TraitAttributes {
     Final = 0x1,
     Override = 0x2,
     Metadata = 0x4
