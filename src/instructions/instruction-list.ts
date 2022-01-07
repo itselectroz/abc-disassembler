@@ -21,7 +21,7 @@ export const instructions = [
     ["coerce_s", 0x85],
     ["construct", 0x42, "u30"],
     ["constructprop", 0x4A, "multiname", "u30"],
-    ["constructsuper", 0x73, "u30"],
+    ["constructsuper", 0x49, "u30"],
     ["convert_b", 0x76],
     ["convert_i", 0x73],
     ["convert_d", 0x75],
@@ -90,7 +90,7 @@ export const instructions = [
     ["label",0x09],
     ["lessequals",0xae],
     ["lessthan",0xad,],
-    ["lookupswitch",0x1b,"s24","u30","array","s24"],
+    ["lookupswitch",0x1b,"s24","u30","array-s24"],
     ["lshift",0xa5],
     ["modulo",0xa4],
     ["multiply",0xa2],
@@ -112,13 +112,13 @@ export const instructions = [
     ["pushbyte",0x24,"u8"],
     ["pushdouble",0x2f,"double"],
     ["pushfalse",0x27],
-    ["pushint",0x2d,"integer"],
+    ["pushint",0x2d,"int"],
     ["pushnamespace",0x31,"namespace"],
     ["pushnan",0x28],
     ["pushnull",0x20],
     ["pushscope",0x30],
-    ["pushshort",0x31,"u30"],
-    ["pushstring",0x31,"string"],
+    ["pushshort",0x25,"u30"],
+    ["pushstring",0x2C,"string"],
     ["pushtrue",0x26],
     ["pushuint",0x2e,"u_int"],
     ["pushundefined",0x21],
@@ -143,3 +143,9 @@ export const instructions = [
     ["typeof", 0x95],
     ["urshift", 0xA7],
 ]
+
+export const instructionMap: any = {};
+
+for(const instruction of instructions) {
+    instructionMap[instruction[1]] = instruction;
+}
