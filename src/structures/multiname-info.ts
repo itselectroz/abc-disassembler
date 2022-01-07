@@ -39,7 +39,7 @@ export class MultinameInfo extends Structure {
 
             case MultinameKind.RTQNameL:
             case MultinameKind.RTQNameLA:
-                structure.data = MultinameKindRTQName.read(data);
+                structure.data = MultinameKindRTQNameL.read(data);
                 break;
 
             case MultinameKind.Multiname:
@@ -88,6 +88,6 @@ export class MultinameKindMultinameL extends Structure {
 }
 
 export class MultinameKindTypeName extends Structure {
-    name: u30 = 0;
+    qname: u30 = 0;
     params: vector<u30, u30> = [];
 }
