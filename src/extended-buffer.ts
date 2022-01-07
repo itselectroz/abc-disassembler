@@ -3,6 +3,10 @@ export class ExtendedBuffer {
 
     offset: number = 0;
 
+    get bytesAvailable() {
+        return this.data.length - this.offset;
+    }
+
     constructor(data?: Buffer) {
         if(data == undefined) {
             data = Buffer.alloc(0);
