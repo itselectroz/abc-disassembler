@@ -12,6 +12,25 @@ export class CPoolInfo extends Structure {
     namespace: incrementedVector<custom<NamespaceInfo>, u30> = [];
     ns_set: incrementedVector<custom<NSSetInfo>, u30> = [];
     multiname: incrementedVector<custom<MultinameInfo>, u30> = [];
+
+    getIndex(type: string, value: any) : number {
+        if(!(type in this)) {
+            return -1;
+        }
+
+        const array: any[] = (this as any)[type];
+        if(!Array.isArray(array)) {
+            return -1;
+        }
+
+        for(let i = 0; i < array.length; i++) {
+            if(array[i] === value) {
+                return i + 1;
+            }
+        }
+
+        return -1;
+    }
 }
 NamespaceInfo;
 NSSetInfo;
