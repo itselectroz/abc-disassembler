@@ -1,7 +1,7 @@
 // not really sure an appropriate name for this class
 
 import { InstructionDisassembler } from ".";
-import { AbcFile, ExtendedBuffer, MethodBodyInfo } from "..";
+import { AbcFile, ExtendedBuffer, MethodBodyInfo, MultinameInfo } from "..";
 import { Instruction } from "./instruction";
 
 export type MethodBodySignature = {
@@ -14,15 +14,93 @@ export type MethodBodySignature = {
     accuracy: number,
 
     code_signature: any[],
+};
+
+export type InstructionParameterReference = {
+    instruction: number;
+    parameter: number;
+}
+
+export type InstructionParameterSignature = {
+    methodSignature: MethodBodySignature;
+    instructionReference: InstructionParameterReference;
+}
+
+export type InstructionParameterSignatureResult = {
+    success: boolean;
+    value: any;
 }
 
 // it's essentially made for generating signatures for code
 export class InstructionFinder {
-    abcFile: AbcFile;
+    get abcFile() {
+        return this._abcFile;
+    }
+
+    set abcFile(value: AbcFile) {
+        this._abcFile = value;
+        this.disassembler = new InstructionDisassembler(this._abcFile);
+    }
+
+    private _abcFile: AbcFile;
+    private disassembler: InstructionDisassembler;
 
     constructor(abcFile: AbcFile) {
-        this.abcFile = abcFile;
+        this._abcFile = abcFile;
+        this.disassembler = new InstructionDisassembler(abcFile);
+    }
 
+    checkMethodForMultinameReference(method_body: MethodBodyInfo, multiname: MultinameInfo) : boolean {
+        // future me; check traits, params, etc
+
+        const code = this.disassembler.disassemble(method_body);
+        for(const instruction of code) {
+            if(instruction.types.includes("multiname")) {
+                for(let i = 0; i < instruction.types.length; i++) {
+                    if(instruction.types[i] != "multiname") {
+                        continue;
+                    }
+
+                    if(instruction.params[i] == multiname) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    xrefMultinameMethods(multiname: MultinameInfo) : MethodBodyInfo[] {
+        const method_bodies = this.abcFile.method_body.filter(v => this.checkMethodForMultinameReference(v, multiname));
+
+        return method_bodies;
+    }
+
+    findMultinameInstructionReference(method_body: MethodBodyInfo, multiname: MultinameInfo) : InstructionParameterReference {
+        // the name is quite unclear but this function finds the instruction offset at which the given multiname is referenced
+        const code = this.disassembler.disassemble(method_body);
+        for(let i = 0; i < code.length; i++) {
+            const instruction = code[i];
+            if(instruction.types.includes("multiname")) {
+                for(let j = 0; j < instruction.types.length; j++) {
+                    if(instruction.types[j] != "multiname") {
+                        continue;
+                    }
+
+                    if(instruction.params[j] == multiname) {
+                        return {
+                            instruction: i,
+                            parameter: j
+                        };
+                    }
+                }
+            }
+        }
+
+        return {
+            instruction: -1,
+            parameter: -1
+        };
     }
 
     readTypeIntoSignature(type: string, param: any, instruction: Instruction, index: number, sigBytes: any[]) {
@@ -72,8 +150,7 @@ export class InstructionFinder {
     }
 
     generateByteSignature(method_body: MethodBodyInfo, sigLen: number = 10): any[] {
-        const instructionDisassembler = new InstructionDisassembler(this.abcFile);
-        const instructions = instructionDisassembler.disassemble(method_body);
+        const instructions = this.disassembler.disassemble(method_body);
         const maxSigLen = instructions.length < sigLen ? instructions.length : sigLen;
 
         const sigBytes: any[] = [];
@@ -136,7 +213,6 @@ export class InstructionFinder {
     }
 
     findByteSignature(signature: any[], count: boolean = false): MethodBodyInfo | false | number {
-        const sigLength = signature.length;
         let c = 0;
         for (let i = 0; i < this.abcFile.method_body.length; i++) {
             const method_body = this.abcFile.method_body[i];
@@ -185,5 +261,60 @@ export class InstructionFinder {
             c++;
         }
         return count ? c : false;
+    }
+
+    generateMultinameSignature(multiname: MultinameInfo) : InstructionParameterSignature | false {
+        const references = this.xrefMultinameMethods(multiname);
+        if(references.length == 0) {
+            return false;
+        }
+        const longestMethod = references.sort((a,b) => b.code.length - a.code.length)[0];
+        const methodSignature = this.generateMethodBodySignature(longestMethod);
+        const instructionReference = this.findMultinameInstructionReference(longestMethod, multiname);
+        
+        if(instructionReference.instruction == -1) {
+            // NOTE: I should probably just pop from the array and try again...
+            return false;
+        }
+
+        return {
+            methodSignature,
+            instructionReference
+        };
+    }
+
+    findInstructionParameterSignature(signature: InstructionParameterSignature) : InstructionParameterSignatureResult {
+        const method = this.findMethodBodySignature(signature.methodSignature);
+        if(method == false || typeof method == "number") {
+            return {
+                success: false,
+                value: undefined
+            }; 
+        }
+
+        const code = this.disassembler.disassemble(method);
+        const instructionReference = signature.instructionReference;
+        if(code.length - 1 < instructionReference.instruction) {
+            return {
+                success: false,
+                value: undefined
+            }; 
+        }
+
+        const instruction = code[instructionReference.instruction];
+
+        if(instruction.params.length - 1 < instructionReference.parameter) {
+            return {
+                success: false,
+                value: undefined
+            };
+        }
+
+        const value = instruction.params[instructionReference.parameter];
+
+        return {
+            success: true,
+            value
+        };
     }
 }

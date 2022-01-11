@@ -1,4 +1,4 @@
-import { AbcFile, ExtendedBuffer, MethodBodyInfo } from "..";
+import { AbcFile, ExtendedBuffer, MethodBodyInfo, MultinameKindQName, TraitMethod, TraitTypes } from "..";
 import { Instruction } from "./instruction";
 import { InstructionFormatter } from "./instruction-formatter";
 import { instructionMap } from "./instruction-list";
@@ -37,6 +37,19 @@ export class InstructionDisassembler {
             case "u8":
                 return code.readUInt8();
         }
+        if (type.startsWith("array1")) {
+            // Same as array, but + 1 on the length.
+            const length = params[params.length - 1] + 1;
+            if (typeof length != "number") {
+                throw new Error(`Expected length to be of type 'number' got type '${typeof length}'`);
+            }
+            const valueType = type.split('-')[1];
+            const arr = [];
+            for (let i = 0; i < length; i++) {
+                arr.push(this.readType(valueType, code, params));
+            }
+            return arr;
+        }
         if (type.startsWith("array")) {
             // I think it's safe to assume that the last read value was the length of the array
             const length = params[params.length - 1];
@@ -63,6 +76,9 @@ export class InstructionDisassembler {
             const instructionId = code.readUInt8();
 
             const instructionData: any[] = instructionMap[instructionId];
+            if (instructionData == undefined) {
+                throw new Error(`Unable to find instruction with id ${instructionId}`);
+            }
 
             const params = [];
             const numArgs = instructionData.length - 2;
