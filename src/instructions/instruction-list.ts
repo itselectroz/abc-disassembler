@@ -91,7 +91,7 @@ export const instructions = [
     ["label",0x09],
     ["lessequals",0xae],
     ["lessthan",0xad,],
-    ["lookupswitch",0x1b,"s24","u30","array1-s24"],
+    ["lookupswitch",0x1b,"offset","u30","array1-offset"],
     ["lshift",0xa5],
     ["modulo",0xa4],
     ["multiply",0xa2],

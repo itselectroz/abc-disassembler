@@ -1,7 +1,5 @@
-// not really sure an appropriate name for this class
-
 import { InstructionDisassembler } from ".";
-import { AbcFile, ExtendedBuffer, MethodBodyInfo, MultinameInfo } from "..";
+import { AbcFile, ExtendedBuffer, MethodBodyInfo, MultinameInfo, TraitMethod } from "..";
 import { Instruction } from "./instruction";
 
 export type MethodBodySignature = {
@@ -31,6 +29,7 @@ export type InstructionParameterSignatureResult = {
     value: any;
 }
 
+// not really sure an appropriate name for this class
 // it's essentially made for generating signatures for code
 export class InstructionFinder {
     get abcFile() {
@@ -138,11 +137,19 @@ export class InstructionFinder {
                 sigBytes.push(param & 0xFF);
                 break;
         }
+        if (type.startsWith("array1")) {
+            const count = instruction.params[index - 1] + 1;
+            const endIndex = ++index + count;
+            while (index < endIndex) {
+                index = this.readTypeIntoSignature(type.substring("array1-".length), instruction.params[index], instruction, index, sigBytes);
+                index++;
+            }
+        }
         if (type.startsWith("array")) {
             const count = instruction.params[index - 1];
             const endIndex = ++index + count;
             while (index < endIndex) {
-                index = this.readTypeIntoSignature(instruction.types[index], instruction.params[index], instruction, index, sigBytes);
+                index = this.readTypeIntoSignature(type.substring("array-".length), instruction.params[index], instruction, index, sigBytes);
                 index++;
             }
         }
@@ -168,7 +175,7 @@ export class InstructionFinder {
         return sigBytes;
     }
 
-    generateMethodBodySignature(method_body: MethodBodyInfo) : MethodBodySignature{
+    generateMethodBodySignature(method_body: MethodBodyInfo, sigLen: number = 10) : MethodBodySignature{
         const bodySignature: MethodBodySignature = {
             local_count: method_body.local_count,
             max_stack: method_body.max_stack,
@@ -178,7 +185,7 @@ export class InstructionFinder {
             trait_count: method_body.trait.length,
             accuracy: 6, // all 6 non code fields must match
 
-            code_signature: this.generateByteSignature(method_body),
+            code_signature: this.generateByteSignature(method_body, sigLen),
         };
 
         return bodySignature;
@@ -263,13 +270,13 @@ export class InstructionFinder {
         return count ? c : false;
     }
 
-    generateMultinameSignature(multiname: MultinameInfo) : InstructionParameterSignature | false {
+    generateInstructionParameterSignature(multiname: MultinameInfo, sigLen: number = 10) : InstructionParameterSignature | false {
         const references = this.xrefMultinameMethods(multiname);
         if(references.length == 0) {
             return false;
         }
         const longestMethod = references.sort((a,b) => b.code.length - a.code.length)[0];
-        const methodSignature = this.generateMethodBodySignature(longestMethod);
+        const methodSignature = this.generateMethodBodySignature(longestMethod, sigLen);
         const instructionReference = this.findMultinameInstructionReference(longestMethod, multiname);
         
         if(instructionReference.instruction == -1) {
