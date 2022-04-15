@@ -275,8 +275,21 @@ export class InstructionFinder {
         if(references.length == 0) {
             return false;
         }
-        const longestMethod = references.sort((a,b) => b.code.length - a.code.length)[0];
-        const methodSignature = this.generateMethodBodySignature(longestMethod, sigLen);
+        const longestMethods = references.sort((a,b) => b.code.length - a.code.length);
+        let longestMethodIndex = Math.floor(longestMethods.length / 2);
+        let longestMethod = longestMethods[longestMethodIndex];
+        let methodSignature = this.generateMethodBodySignature(longestMethod, sigLen);
+        
+        while(this.findMethodBodySignature(methodSignature, true) > 1) {
+            if(longestMethodIndex == longestMethods.length - 1) {
+                return false;
+            }
+            longestMethods.splice(longestMethodIndex, 1);
+            longestMethodIndex = Math.floor(longestMethods.length / 2);
+            longestMethod = longestMethods[longestMethodIndex];
+            methodSignature = this.generateMethodBodySignature(longestMethod, sigLen);
+        }
+
         const instructionReference = this.findMultinameInstructionReference(longestMethod, multiname);
         
         if(instructionReference.instruction == -1) {
