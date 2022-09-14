@@ -1,6 +1,6 @@
 {
   "name": "abc-disassembler",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Typescript Actionscript Bytecode Disassembler",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
